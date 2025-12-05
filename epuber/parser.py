@@ -183,11 +183,7 @@ class Parser:
             章节列表，每个章节包含 title, content, type 等信息
         """
         lines = content.split("\n")
-        iterator = (
-            tqdm(lines, desc="解析章节", unit="行", disable=not show_progress)
-            if show_progress
-            else lines
-        )
+        iterator = tqdm(lines, desc="解析章节", unit="行", disable=not show_progress) if show_progress else lines
         chapters = []
         current_title = None
         current_content = []

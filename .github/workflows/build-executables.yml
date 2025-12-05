@@ -57,7 +57,7 @@ jobs:
         pyinstaller --onefile --name epuber-${{ matrix.platform }}-${{ matrix.arch }} main.py
 
     - name: Upload executable
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: epuber-${{ matrix.platform }}-${{ matrix.arch }}
         path: dist/epuber-${{ matrix.platform }}-${{ matrix.arch }}*
@@ -71,7 +71,7 @@ jobs:
 
     steps:
     - name: Download all artifacts
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         path: artifacts
 
