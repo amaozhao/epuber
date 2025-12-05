@@ -29,10 +29,10 @@ jobs:
           - os: windows-latest
             platform: windows
             arch: x86_64
-          - os: macos-latest
+          - os: macos-13
             platform: macos
             arch: x86_64
-          - os: macos-latest
+          - os: macos-14
             platform: macos
             arch: arm64
 
@@ -55,6 +55,21 @@ jobs:
     - name: Build executable with PyInstaller
       run: |
         pyinstaller --onefile --name epuber-${{ matrix.platform }}-${{ matrix.arch }} main.py
+
+    - name: Verify build architecture
+      shell: bash
+      run: |
+        actual="$(uname -m)"
+        expected="${{ matrix.arch }}"
+        echo "Expected arch: ${expected}, actual: ${actual}"
+        if [ "${expected}" = "x86_64" ] && [ "${actual}" != "x86_64" ]; then
+          echo "Architecture mismatch!" >&2
+          exit 1
+        fi
+        if [ "${expected}" = "arm64" ] && [ "${actual}" != "arm64" ]; then
+          echo "Architecture mismatch!" >&2
+          exit 1
+        fi
 
     - name: Normalize Windows executable extension
       if: matrix.platform == 'windows'
