@@ -56,6 +56,11 @@ jobs:
       run: |
         pyinstaller --onefile --name epuber-${{ matrix.platform }}-${{ matrix.arch }} main.py
 
+    - name: Show dist contents
+      run: |
+        echo "Dist directory contents:"
+        ls -l dist || true
+
     - name: Verify build architecture
       shell: bash
       run: |
@@ -92,7 +97,9 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: epuber-${{ matrix.platform }}-${{ matrix.arch }}
-        path: ${{ matrix.platform == 'windows' && format('dist/epuber-{0}-{1}.exe', matrix.platform, matrix.arch) || format('dist/epuber-{0}-{1}*', matrix.platform, matrix.arch) }}
+        path: |
+          ${{ matrix.platform == 'windows' && format('dist/epuber-{0}-{1}.exe', matrix.platform, matrix.arch) || format('dist/epuber-{0}-{1}', matrix.platform, matrix.arch) }}
+        if-no-files-found: error
         retention-days: ${{ github.ref_type == 'tag' && 90 || 30 }}
 
   # 只有在创建tag时才创建GitHub Release
