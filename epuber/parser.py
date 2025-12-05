@@ -34,7 +34,7 @@ class Parser:
             self.config.update(config)
 
     def _get_default_config(self) -> Dict[str, Any]:
-        """获取默认配置"""
+        """【修改】获取默认配置：添加标题清洗正则"""
         return {
             # 卷标题正则表达式
             "volume_patterns": [
@@ -57,6 +57,19 @@ class Parser:
                 r"^后记",
                 r"^番外[:：]",
                 r"^外传[:：]",
+                # 匹配：行首数字 + 点 + 1到30个字的标题内容 + 行尾 (长度为 {1,30}，未修改)
+                r"^\s*[0-9]+\s*[.．、].{1,30}$",
+            ],
+            # 【新增】标题清洗规则
+            "title_clean_patterns": [
+                # 匹配中文括号及其内容
+                r"【.*?】",
+                r"『.*?』",
+                r"〔.*?〕",
+                r"（.*?）",
+                # 匹配英文括号及其内容
+                r"\s*\(.*?\)\s*",
+                r"\s*\[.*?\]\s*",
             ],
             # 内容类型关键词
             "content_keywords": {
@@ -93,6 +106,18 @@ class Parser:
                 "番外": "extra",
             },
         }
+
+    def _clean_title(self, title: str) -> str:
+        """【新增】清洗标题，只移除干扰信息，保留原有标题结构和数字"""
+
+        # 1. 移除配置中定义的干扰模式（现在是通用括号）
+        cleaned_title = title.strip()
+        for pattern in self.config.get("title_clean_patterns", []):
+            # 使用 re.sub 替换匹配到的模式为空字符串
+            cleaned_title = re.sub(pattern, "", cleaned_title)
+
+        # 2. 保证不进行任何去除数字和分隔符的操作
+        return cleaned_title.strip()
 
     def parse(self, file_path: Path, show_progress: bool = False) -> List[Volume]:
         """解析小说文件
@@ -174,14 +199,7 @@ class Parser:
             raise FileParseError(f"无法解码文件内容: {file_path}。文件可能已损坏或使用了不支持的编码。")
 
     def _split_chapters(self, content: str, show_progress: bool = False) -> List[Dict[str, Any]]:
-        """将小说内容按章节分割
-
-        Args:
-            content: 完整小说内容
-
-        Returns:
-            章节列表，每个章节包含 title, content, type 等信息
-        """
+        """【修改】将小说内容按章节分割，并对标题进行清洗"""
         lines = content.split("\n")
         iterator = tqdm(lines, desc="解析章节", unit="行", disable=not show_progress) if show_progress else lines
         chapters = []
@@ -204,7 +222,14 @@ class Parser:
                         chapters.append(chapter_data)
 
                 # 开始新章节
-                current_title = line_stripped
+                current_title = self._clean_title(line_stripped)
+
+                # 如果清洗后标题为空，保留原行，避免流程被改变
+                if not current_title:
+                    current_content.append(line)
+                    current_title = None
+                    continue
+
                 current_content = []
             else:
                 # 累积内容
@@ -224,6 +249,7 @@ class Parser:
 
     def _create_chapter_data(self, title: str, content: str) -> Dict[str, Any]:
         """创建章节数据"""
+        # 原始逻辑，未修改
         return {
             "title": title,
             "content": content,
@@ -296,6 +322,7 @@ class Parser:
 
     def _has_volumes(self, chapters: List[Dict[str, Any]]) -> bool:
         """检查是否有卷标题"""
+        # 原始逻辑，未修改
         return any(chapter["is_volume"] for chapter in chapters)
 
     def _create_flat_structure(self, chapters: List[Dict[str, Any]]) -> List[Volume]:
