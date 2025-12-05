@@ -53,12 +53,7 @@ jobs:
         pip install pyinstaller
 
     - name: Build executable with PyInstaller
-      run: |
-        pyinstaller \
-          --onefile \
-          --hidden-import _posixsubprocess \
-          --name epuber-${{ matrix.platform }}-${{ matrix.arch }} \
-          main.py
+      run: pyinstaller --onefile --hidden-import _posixsubprocess --name epuber-${{ matrix.platform }}-${{ matrix.arch }} main.py
 
     - name: Show dist contents
       run: |
