@@ -56,11 +56,28 @@ jobs:
       run: |
         pyinstaller --onefile --name epuber-${{ matrix.platform }}-${{ matrix.arch }} main.py
 
+    - name: Normalize Windows executable extension
+      if: matrix.platform == 'windows'
+      shell: bash
+      run: |
+        base="dist/epuber-${{ matrix.platform }}-${{ matrix.arch }}"
+        if [ -f "${base}.exe" ]; then
+          echo "Found ${base}.exe"
+        elif [ -f "${base}" ]; then
+          echo "Renaming ${base} -> ${base}.exe"
+          mv "${base}" "${base}.exe"
+        else
+          echo "No executable found in dist/"
+          ls -l dist || true
+          exit 1
+        fi
+        ls -l dist
+
     - name: Upload executable
       uses: actions/upload-artifact@v4
       with:
         name: epuber-${{ matrix.platform }}-${{ matrix.arch }}
-        path: dist/epuber-${{ matrix.platform }}-${{ matrix.arch }}*
+        path: ${{ matrix.platform == 'windows' && format('dist/epuber-{0}-{1}.exe', matrix.platform, matrix.arch) || format('dist/epuber-{0}-{1}*', matrix.platform, matrix.arch) }}
         retention-days: ${{ github.ref_type == 'tag' && 90 || 30 }}
 
   # 只有在创建tag时才创建GitHub Release
