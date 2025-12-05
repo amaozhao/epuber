@@ -52,8 +52,13 @@ jobs:
         pip install -e .
         pip install pyinstaller
 
-    - name: Build executable with PyInstaller
+    - name: Build executable with PyInstaller (Windows)
+      if: matrix.platform == 'windows'
       run: pyinstaller --onefile --hidden-import _posixsubprocess --name epuber-${{ matrix.platform }}-${{ matrix.arch }} main.py
+
+    - name: Build executable with PyInstaller (macOS/Linux)
+      if: matrix.platform != 'windows'
+      run: pyinstaller --onefile --hidden-import _posixsubprocess --collect-binaries _posixsubprocess --name epuber-${{ matrix.platform }}-${{ matrix.arch }} main.py
 
     - name: Show dist contents
       run: |
