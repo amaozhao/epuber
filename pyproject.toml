@@ -1,0 +1,77 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "epuber"
+version = "0.1.0"
+description = "EPUB小说生成器 - 将TXT小说转换为标准EPUB格式"
+readme = "README.md"
+license = {text = "MIT"}
+authors = [
+    {name = "AmaoZhao", email = "amaozhao@gmail.com"},
+]
+keywords = ["epub", "novel", "converter", "ebook", "txt"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: End Users/Desktop",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Text Processing :: Markup",
+    "Topic :: Utilities",
+]
+requires-python = ">=3.10"
+dependencies = [
+    "chardet>=5.2.0",
+    "ebooklib>=0.20",
+    "pydantic>=2.12.5",
+    "rich>=14.0.0",
+    "typer[all]>=0.20.0",
+    "Pillow>=12.0.0",
+    "tqdm>=4.67.1",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pytest-cov",
+    "ruff",
+    "mypy",
+]
+
+
+[project.scripts]
+epuber = "epuber.main:app"
+
+[project.urls]
+Homepage = "https://github.com/amaozhao/epuber"
+Repository = "https://github.com/amaozhao/epuber.git"
+Issues = "https://github.com/amaozhao/epuber/issues"
+Changelog = "https://github.com/amaozhao/epuber/blob/main/CHANGELOG.md"
+
+[tool.ruff]
+line-length = 119
+target-version = "py310"
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+docstring-code-format = true
+docstring-code-line-length = 100
+
+[tool.ruff.lint]
+extend-safe-fixes = ["E", "F401"]
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+addopts = "-ra -q"
+testpaths = ["tests"]
+python_files = "test_*.py"
+python_classes = "Test*"
+python_functions = "test_*"

@@ -1,0 +1,9 @@
+include README.md
+include CHANGELOG.md
+include LICENSE
+recursive-include epuber *.py
+recursive-include epuber/templates *.css
+global-exclude *.pyc
+global-exclude __pycache__
+global-exclude *.pyo
+global-exclude .git*
