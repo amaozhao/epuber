@@ -26,19 +26,15 @@ jobs:
           - os: ubuntu-latest
             platform: linux
             arch: x86_64
-            ext: ""
           - os: windows-latest
             platform: windows
             arch: x86_64
-            ext: ".exe"
           - os: macos-15-intel
             platform: macos
             arch: x86_64
-            ext: ""
           - os: macos-latest
             platform: macos
             arch: arm64
-            ext: ""
 
     runs-on: ${{ matrix.os }}
 
@@ -54,20 +50,10 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -e .
-        pip install nuitka zstandard
+        pip install pyinstaller
 
-    - name: Build executable with Nuitka
-      shell: bash
-      run: |
-        fname="epuber-${{ matrix.platform }}-${{ matrix.arch }}${{ matrix.ext }}"
-        python -m nuitka \
-          --onefile \
-          --standalone \
-          --follow-imports \
-          --output-filename="$fname" \
-          main.py
-        echo "Built file:"
-        ls -l "$fname"
+    - name: Build executable with PyInstaller
+      run: pyinstaller --onefile --hidden-import _posixsubprocess --name epuber-${{ matrix.platform }}-${{ matrix.arch }} main.py
 
     - name: Show dist contents
       run: |
@@ -110,7 +96,8 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: epuber-${{ matrix.platform }}-${{ matrix.arch }}
-        path: epuber-${{ matrix.platform }}-${{ matrix.arch }}${{ matrix.ext }}
+        path: |
+          ${{ matrix.platform == 'windows' && format('dist/epuber-{0}-{1}.exe', matrix.platform, matrix.arch) || format('dist/epuber-{0}-{1}', matrix.platform, matrix.arch) }}
         if-no-files-found: error
         retention-days: ${{ github.ref_type == 'tag' && 90 || 30 }}
 

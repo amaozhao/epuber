@@ -2,6 +2,7 @@
 Epuber - EPUB 生成器主入口
 """
 
+import multiprocessing
 import re
 import traceback
 from pathlib import Path
@@ -135,7 +136,6 @@ def validate(
     """
     # 设置日志
     logger = setup_logger(verbose)
-
     try:
         logger.step(1, f"开始验证 EPUB 文件: {input}")
         generator = EpubGenerator()
@@ -157,4 +157,5 @@ def validate(
 
 
 if __name__ == "__main__":
+    multiprocessing.freeze_support()
     app()
