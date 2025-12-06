@@ -22,7 +22,7 @@ class Cover:
         if not HAS_PIL:
             raise EpubGenerationError("需要Pillow库: pip install Pillow")
 
-        self.w, self.h = 800, 1200  # 尺寸
+        self.w, self.h = 1500, 2200  # 尺寸
         self.font_big = self._font(72)  # 大字体
         self.font_small = self._font(36)  # 小字体
 
