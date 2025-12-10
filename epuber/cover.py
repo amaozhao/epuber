@@ -23,7 +23,7 @@ class Cover:
             raise EpubGenerationError("需要Pillow库: pip install Pillow")
 
         self.w, self.h = 1400, 1800  # 尺寸
-        self.font_big = self._font(72)  # 大字体
+        self.font_big = self._font(144)  # 大字体
         self.font_small = self._font(36)  # 小字体
 
     def _font(self, size):
